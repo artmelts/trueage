@@ -9,26 +9,62 @@ TrueAge.calculate = function(data) {
 
   // ═══════════════════════════════════════════════════════════════
   // PART 1 — CARDIOVASCULAR AGE
+  // Two modes: A = home test (squats), B = workout data
   // ═══════════════════════════════════════════════════════════════
   let cardioAdj = 0;
-
-  const rhr = parseFloat(data.restingHR);
-  if      (rhr < 50)  cardioAdj -= 7;
-  else if (rhr < 60)  cardioAdj -= 4;
-  else if (rhr < 70)  cardioAdj -= 1;
-  else if (rhr <= 80) cardioAdj += 2;
-  else if (rhr <= 90) cardioAdj += 5;
-  else                cardioAdj += 9;
-
-  const hrAfter      = parseFloat(data.exerciseHR);
-  const hrRecovery   = parseFloat(data.recoveryHR);
-  const recoveryDrop = hrAfter - hrRecovery;
   let recoveryAdj = 0;
-  if      (recoveryDrop > 25)  recoveryAdj = -4;
-  else if (recoveryDrop >= 15) recoveryAdj = -1;
-  else if (recoveryDrop >= 10) recoveryAdj =  2;
-  else                         recoveryAdj =  6;
-  cardioAdj += recoveryAdj;
+
+  if (data.cardioMode === 'workout') {
+    // ── Mode B: Workout data ──────────────────────────────────────
+    const avgHR      = parseFloat(data.workoutAvgHR);
+    const maxHR      = parseFloat(data.workoutMaxHR);
+    const duration   = parseFloat(data.workoutDuration);
+
+    // Theoretical max HR for age (Tanaka formula, more accurate than 220-age)
+    const theoMax = 208 - (0.7 * age);
+
+    // Max HR achieved as % of theoretical max
+    const maxPct = maxHR / theoMax;
+    if      (maxPct > 1.05) cardioAdj -= 8;  // elite — exceeds theoretical
+    else if (maxPct > 0.95) cardioAdj -= 5;
+    else if (maxPct > 0.88) cardioAdj -= 2;
+    else if (maxPct > 0.80) cardioAdj += 1;
+    else                    cardioAdj += 4;
+
+    // Avg HR as % of max — indicates sustained intensity
+    const avgPct = avgHR / maxHR;
+    if      (avgPct > 0.88) cardioAdj -= 4;  // very high sustained intensity
+    else if (avgPct > 0.80) cardioAdj -= 2;
+    else if (avgPct > 0.70) cardioAdj += 0;
+    else                    cardioAdj += 2;
+
+    // Duration bonus — sustained effort
+    if      (duration >= 50) cardioAdj -= 3;
+    else if (duration >= 30) cardioAdj -= 1;
+    else if (duration >= 20) cardioAdj += 0;
+    else                     cardioAdj += 2;
+
+    recoveryAdj = 0; // not measured in workout mode
+
+  } else {
+    // ── Mode A: Home test (30 squats) ────────────────────────────
+    const rhr = parseFloat(data.restingHR);
+    if      (rhr < 50)  cardioAdj -= 7;
+    else if (rhr < 60)  cardioAdj -= 4;
+    else if (rhr < 70)  cardioAdj -= 1;
+    else if (rhr <= 80) cardioAdj += 2;
+    else if (rhr <= 90) cardioAdj += 5;
+    else                cardioAdj += 9;
+
+    const hrAfter    = parseFloat(data.exerciseHR);
+    const hrRecovery = parseFloat(data.recoveryHR);
+    const recoveryDrop = hrAfter - hrRecovery;
+    if      (recoveryDrop > 25)  recoveryAdj = -4;
+    else if (recoveryDrop >= 15) recoveryAdj = -1;
+    else if (recoveryDrop >= 10) recoveryAdj =  2;
+    else                         recoveryAdj =  6;
+    cardioAdj += recoveryAdj;
+  }
 
   let bpAdj = 0;
   const bp = parseFloat(data.bloodPressure);

@@ -189,34 +189,75 @@
           </div>
         </div>
 
-        <!-- Resting HR -->
+        <!-- Cardio mode toggle -->
         <div class="field-group">
-          <label class="field-label" data-i18n="fields.restingHR"></label>
-          <input type="number" id="input-restingHR" class="field-input"
-                 min="30" max="130" data-i18n-placeholder="fields.restingHRPlaceholder">
-          <small class="field-hint" data-i18n="fields.restingHRHint"></small>
-          <div class="field-error" data-i18n="required"></div>
+          <label class="field-label" data-i18n="fields.cardioMode"></label>
+          <div class="toggle-group">
+            <button class="cardio-mode-btn active" data-mode="test" data-i18n="fields.modeTest"></button>
+            <button class="cardio-mode-btn" data-mode="workout" data-i18n="fields.modeWorkout"></button>
+          </div>
+          <small class="field-hint" data-i18n="fields.cardioModeHint"></small>
         </div>
 
-        <!-- Exercise HR -->
-        <div class="field-group">
-          <label class="field-label" data-i18n="fields.exerciseHR"></label>
-          <input type="number" id="input-exerciseHR" class="field-input"
-                 min="60" max="220" data-i18n-placeholder="fields.exerciseHRPlaceholder">
-          <small class="field-hint" data-i18n="fields.exerciseHRHint"></small>
-          <div class="field-error" data-i18n="required"></div>
+        <!-- MODE A: Home test (30 squats) -->
+        <div id="cardio-mode-test">
+          <div class="blood-section-label" data-i18n="fields.modeTestLabel"></div>
+          <div class="form-fields-inner">
+            <div class="field-group">
+              <label class="field-label" data-i18n="fields.restingHR"></label>
+              <input type="number" id="input-restingHR" class="field-input"
+                     min="30" max="130" data-i18n-placeholder="fields.restingHRPlaceholder">
+              <small class="field-hint" data-i18n="fields.restingHRHint"></small>
+              <div class="field-error" data-i18n="required"></div>
+            </div>
+            <div class="field-group">
+              <label class="field-label" data-i18n="fields.exerciseHR"></label>
+              <input type="number" id="input-exerciseHR" class="field-input"
+                     min="60" max="220" data-i18n-placeholder="fields.exerciseHRPlaceholder">
+              <small class="field-hint" data-i18n="fields.exerciseHRHint"></small>
+              <div class="field-error" data-i18n="required"></div>
+            </div>
+            <div class="field-group">
+              <label class="field-label" data-i18n="fields.recoveryHR"></label>
+              <input type="number" id="input-recoveryHR" class="field-input"
+                     min="40" max="210" data-i18n-placeholder="fields.recoveryHRPlaceholder">
+              <small class="field-hint" data-i18n="fields.recoveryHRHint"></small>
+              <div class="field-error" data-i18n="required"></div>
+            </div>
+          </div>
         </div>
 
-        <!-- Recovery HR -->
-        <div class="field-group">
-          <label class="field-label" data-i18n="fields.recoveryHR"></label>
-          <input type="number" id="input-recoveryHR" class="field-input"
-                 min="40" max="210" data-i18n-placeholder="fields.recoveryHRPlaceholder">
-          <small class="field-hint" data-i18n="fields.recoveryHRHint"></small>
-          <div class="field-error" data-i18n="required"></div>
+        <!-- MODE B: Workout data (Garmin / training) -->
+        <div id="cardio-mode-workout" style="display:none">
+          <div class="blood-section-label" data-i18n="fields.modeWorkoutLabel"></div>
+          <div class="form-fields-inner">
+            <div class="field-row">
+              <div class="field-group">
+                <label class="field-label" data-i18n="fields.workoutAvgHR"></label>
+                <input type="number" id="input-workoutAvgHR" class="field-input"
+                       min="80" max="210" placeholder="bpm">
+                <small class="field-hint" data-i18n="fields.workoutAvgHRHint"></small>
+                <div class="field-error" data-i18n="required"></div>
+              </div>
+              <div class="field-group">
+                <label class="field-label" data-i18n="fields.workoutMaxHR"></label>
+                <input type="number" id="input-workoutMaxHR" class="field-input"
+                       min="100" max="220" placeholder="bpm">
+                <small class="field-hint" data-i18n="fields.workoutMaxHRHint"></small>
+                <div class="field-error" data-i18n="required"></div>
+              </div>
+            </div>
+            <div class="field-group">
+              <label class="field-label" data-i18n="fields.workoutDuration"></label>
+              <input type="number" id="input-workoutDuration" class="field-input"
+                     min="5" max="300" placeholder="min">
+              <small class="field-hint" data-i18n="fields.workoutDurationHint"></small>
+              <div class="field-error" data-i18n="required"></div>
+            </div>
+          </div>
         </div>
 
-        <!-- Blood Pressure (optional) -->
+        <!-- Blood Pressure (optional, both modes) -->
         <div class="field-group">
           <label class="field-label" data-i18n="fields.bloodPressure"></label>
           <input type="number" id="input-bloodPressure" class="field-input optional"

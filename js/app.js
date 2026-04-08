@@ -83,10 +83,13 @@ function updateI18n() {
 
 // ─── FORM COLLECTION ─────────────────────────────────────────────────────────
 function collectStep1() {
-  ['age','height','waist','restingHR','exerciseHR','recoveryHR','bloodPressure'].forEach(f => {
+  ['age','height','waist','bloodPressure',
+   'restingHR','exerciseHR','recoveryHR',
+   'workoutAvgHR','workoutMaxHR','workoutDuration'].forEach(f => {
     const el = document.getElementById('input-' + f);
     if (el) formData[f] = el.value.trim();
   });
+  if (!formData.cardioMode) formData.cardioMode = 'test';
 }
 
 function collectStep2() {
@@ -100,7 +103,13 @@ function collectStep2() {
 function validateStep1() {
   let valid = true;
 
-  const required = ['age','height','waist','restingHR','exerciseHR','recoveryHR'];
+  // Required fields depend on cardio mode
+  const mode = formData.cardioMode || 'test';
+  const cardioFields = mode === 'workout'
+    ? ['workoutAvgHR','workoutMaxHR','workoutDuration']
+    : ['restingHR','exerciseHR','recoveryHR'];
+
+  const required = ['age','height','waist', ...cardioFields];
   required.forEach(field => {
     const input = document.getElementById('input-' + field);
     const val   = input ? parseFloat(input.value) : NaN;
@@ -238,15 +247,23 @@ function scoreToGradient(score) {
 
 // ─── RESET ───────────────────────────────────────────────────────────────────
 function resetApp() {
-  formData = {};
+  formData = { cardioMode: 'test' };
   results  = null;
   document.querySelectorAll('.screen input').forEach(inp => inp.value = '');
   document.querySelectorAll('.gender-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.cardio-mode-btn').forEach((b, i) => {
+    b.classList.toggle('active', i === 0);
+  });
   document.querySelectorAll('.unit-btn').forEach((b, i) => {
     b.classList.toggle('active', i === 0);
   });
   document.querySelectorAll('.field-input').forEach(i => i.classList.remove('error'));
   document.querySelectorAll('.field-error').forEach(e => e.style.display = 'none');
+  // Reset cardio mode panels
+  const testPanel    = document.getElementById('cardio-mode-test');
+  const workoutPanel = document.getElementById('cardio-mode-workout');
+  if (testPanel)    testPanel.style.display    = 'block';
+  if (workoutPanel) workoutPanel.style.display = 'none';
 }
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
@@ -261,6 +278,21 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btn-start')?.addEventListener('click', () => {
     resetApp();
     showScreen('step1');
+  });
+
+  // Cardio mode toggle
+  document.querySelectorAll('.cardio-mode-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.cardio-mode-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      formData.cardioMode = btn.dataset.mode;
+      const isWorkout = btn.dataset.mode === 'workout';
+      document.getElementById('cardio-mode-test').style.display    = isWorkout ? 'none' : 'block';
+      document.getElementById('cardio-mode-workout').style.display = isWorkout ? 'block' : 'none';
+      // clear errors when switching
+      document.querySelectorAll('.field-input').forEach(i => i.classList.remove('error'));
+      document.querySelectorAll('.field-error').forEach(e => e.style.display = 'none');
+    });
   });
 
   // Gender toggle
