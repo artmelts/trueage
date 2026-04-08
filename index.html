@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TrueAge — Biological Age Calculator</title>
+  <meta name="description" content="Science-based biological age assessment in 2 steps. Know your real age.">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Language switcher (fixed, always visible) -->
+  <div class="lang-switcher">
+    <button class="lang-btn active" data-lang="en">EN</button>
+    <button class="lang-btn" data-lang="ru">РУ</button>
+    <button class="lang-btn" data-lang="he">עב</button>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════
+       SCREEN 1: LANDING
+       ════════════════════════════════════════════════════════ -->
+  <div id="screen-landing" class="screen">
+
+    <div class="landing-bg">
+      <svg class="ecg-line" viewBox="0 0 900 80" preserveAspectRatio="none">
+        <polyline class="ecg-path" points="
+          0,40 80,40 100,40 110,15 120,65 130,40 150,40
+          200,40 220,40 230,12 240,68 250,40 270,40
+          350,40 370,40 380,15 390,65 400,40 420,40
+          500,40 520,40 530,12 540,68 550,40 570,40
+          650,40 670,40 680,15 690,65 700,40 720,40
+          900,40"/>
+      </svg>
+    </div>
+
+    <div class="landing-content">
+
+      <!-- Logo -->
+      <div class="logo">
+        <svg width="34" height="34" viewBox="0 0 34 34" fill="none">
+          <path d="M17 5C11.5 5 7 9.5 7 15c0 3.2 1.5 6 4 7.8L17 27l6-4.2c2.5-1.8 4-4.6 4-7.8C27 9.5 22.5 5 17 5z"
+                stroke="#00d4aa" stroke-width="1.5" fill="rgba(0,212,170,0.06)"/>
+          <path d="M10 15h3.5l2-4 2.5 8 2-4H24"
+                stroke="#f5c842" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="logo-text">TrueAge</span>
+        <span class="beta-badge">BETA</span>
+      </div>
+
+      <!-- Hero -->
+      <div class="hero">
+        <h1 class="hero-title" data-i18n-html="tagline"></h1>
+        <p class="hero-subtitle" data-i18n="subtitle"></p>
+        <button id="btn-start" class="btn-primary btn-large">
+          <span data-i18n="startBtn"></span>
+          <span class="btn-arrow">→</span>
+        </button>
+        <p class="beta-note" data-i18n="betaNote"></p>
+      </div>
+
+      <!-- What we measure -->
+      <div class="measures-section">
+        <h3 class="measures-title" data-i18n="whatWeMeasure"></h3>
+        <div class="measures-grid">
+
+          <div class="measure-card">
+            <div class="measure-icon">
+              <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+                <path d="M14 5C9.5 5 6 8.5 6 13c0 2.7 1.3 5 3.5 6.5L14 23l4.5-3.5C20.7 18 22 15.7 22 13 22 8.5 18.5 5 14 5z"
+                      stroke="#00d4aa" stroke-width="1.5" fill="none"/>
+                <path d="M8 13h3l2-3.5 2.5 7 2-3.5H20"
+                      stroke="#00d4aa" stroke-width="1.2" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="measure-text">
+              <strong data-i18n="measures.heart.title"></strong>
+              <span data-i18n="measures.heart.desc"></span>
+            </div>
+          </div>
+
+          <div class="measure-card">
+            <div class="measure-icon">
+              <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+                <circle cx="14" cy="9" r="4" stroke="#f5c842" stroke-width="1.5"/>
+                <path d="M7 23c0-3.9 3.1-7 7-7s7 3.1 7 7" stroke="#f5c842" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M9 18.5h10" stroke="#f5c842" stroke-width="1" stroke-dasharray="2 1.5" opacity="0.5"/>
+              </svg>
+            </div>
+            <div class="measure-text">
+              <strong data-i18n="measures.body.title"></strong>
+              <span data-i18n="measures.body.desc"></span>
+            </div>
+          </div>
+
+          <div class="measure-card">
+            <div class="measure-icon">
+              <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+                <circle cx="14" cy="14" r="8" stroke="#00d4aa" stroke-width="1.5" opacity="0.4"/>
+                <circle cx="14" cy="14" r="5" stroke="#00d4aa" stroke-width="1.2"/>
+                <path d="M10 14h2.5l1.5-2.5 2 5 1.5-2.5H18" stroke="#f5c842" stroke-width="1.1" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="measure-text">
+              <strong data-i18n="measures.blood.title"></strong>
+              <span data-i18n="measures.blood.desc"></span>
+            </div>
+          </div>
+
+          <div class="measure-card">
+            <div class="measure-icon">
+              <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+                <path d="M14 22V8" stroke="#f5c842" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M10 12l4-4 4 4" stroke="#f5c842" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M8 19h12" stroke="#00d4aa" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M10 22h8" stroke="#00d4aa" stroke-width="1" stroke-linecap="round" opacity="0.4"/>
+              </svg>
+            </div>
+            <div class="measure-text">
+              <strong data-i18n="measures.recovery.title"></strong>
+              <span data-i18n="measures.recovery.desc"></span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div><!-- /screen-landing -->
+
+
+  <!-- ════════════════════════════════════════════════════════
+       SCREEN 2: STEP 1 — BASIC PARAMETERS
+       ════════════════════════════════════════════════════════ -->
+  <div id="screen-step1" class="screen">
+    <div class="form-container">
+
+      <div class="form-header">
+        <button class="btn-back icon-btn" data-back="landing">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M13 4L7 10l6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </button>
+        <div class="progress-indicator">
+          <div class="step-dot active">1</div>
+          <div class="step-line"></div>
+          <div class="step-dot">2</div>
+        </div>
+      </div>
+
+      <h2 class="form-title" data-i18n="step1Title"></h2>
+      <p class="form-subtitle" data-i18n="step1Subtitle"></p>
+
+      <div class="form-fields">
+
+        <!-- Age -->
+        <div class="field-group">
+          <label class="field-label" data-i18n="fields.age"></label>
+          <input type="number" id="input-age" class="field-input"
+                 min="18" max="100" data-i18n-placeholder="fields.agePlaceholder">
+          <div class="field-error" data-i18n="required"></div>
+        </div>
+
+        <!-- Gender -->
+        <div class="field-group">
+          <label class="field-label" data-i18n="fields.gender"></label>
+          <div class="toggle-group">
+            <button class="gender-btn" data-gender="male" data-i18n="fields.male"></button>
+            <button class="gender-btn" data-gender="female" data-i18n="fields.female"></button>
+          </div>
+          <div class="field-error" id="gender-error" data-i18n="required" style="display:none"></div>
+        </div>
+
+        <!-- Height + Waist -->
+        <div class="field-row">
+          <div class="field-group">
+            <label class="field-label" data-i18n="fields.height"></label>
+            <input type="number" id="input-height" class="field-input"
+                   min="130" max="230" data-i18n-placeholder="fields.heightPlaceholder">
+            <div class="field-error" data-i18n="required"></div>
+          </div>
+          <div class="field-group">
+            <label class="field-label">
+              <span data-i18n="fields.waist"></span>
+              <span class="tooltip-icon" data-i18n-tooltip="fields.waistTooltip">?</span>
+            </label>
+            <input type="number" id="input-waist" class="field-input"
+                   min="50" max="180" data-i18n-placeholder="fields.waistPlaceholder">
+            <div class="field-error" data-i18n="required"></div>
+          </div>
+        </div>
+
+        <!-- Resting HR -->
+        <div class="field-group">
+          <label class="field-label" data-i18n="fields.restingHR"></label>
+          <input type="number" id="input-restingHR" class="field-input"
+                 min="30" max="130" data-i18n-placeholder="fields.restingHRPlaceholder">
+          <small class="field-hint" data-i18n="fields.restingHRHint"></small>
+          <div class="field-error" data-i18n="required"></div>
+        </div>
+
+        <!-- Exercise HR -->
+        <div class="field-group">
+          <label class="field-label" data-i18n="fields.exerciseHR"></label>
+          <input type="number" id="input-exerciseHR" class="field-input"
+                 min="60" max="220" data-i18n-placeholder="fields.exerciseHRPlaceholder">
+          <small class="field-hint" data-i18n="fields.exerciseHRHint"></small>
+          <div class="field-error" data-i18n="required"></div>
+        </div>
+
+        <!-- Recovery HR -->
+        <div class="field-group">
+          <label class="field-label" data-i18n="fields.recoveryHR"></label>
+          <input type="number" id="input-recoveryHR" class="field-input"
+                 min="40" max="210" data-i18n-placeholder="fields.recoveryHRPlaceholder">
+          <small class="field-hint" data-i18n="fields.recoveryHRHint"></small>
+          <div class="field-error" data-i18n="required"></div>
+        </div>
+
+        <!-- Blood Pressure (optional) -->
+        <div class="field-group">
+          <label class="field-label" data-i18n="fields.bloodPressure"></label>
+          <input type="number" id="input-bloodPressure" class="field-input optional"
+                 min="80" max="220" data-i18n-placeholder="fields.bloodPressurePlaceholder">
+          <small class="field-hint" data-i18n="fields.bloodPressureHint"></small>
+        </div>
+
+      </div><!-- /form-fields -->
+
+      <button id="btn-next" class="btn-primary btn-full">
+        <span data-i18n="nextBtn"></span>
+        <span class="btn-arrow">→</span>
+      </button>
+
+    </div>
+  </div><!-- /screen-step1 -->
+
+
+  <!-- ════════════════════════════════════════════════════════
+       SCREEN 3: STEP 2 — BLOOD MARKERS (OPTIONAL)
+       ════════════════════════════════════════════════════════ -->
+  <div id="screen-step2" class="screen">
+    <div class="form-container">
+
+      <div class="form-header">
+        <button class="btn-back icon-btn" data-back="step1">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M13 4L7 10l6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </button>
+        <div class="progress-indicator">
+          <div class="step-dot done">✓</div>
+          <div class="step-line active"></div>
+          <div class="step-dot active">2</div>
+        </div>
+      </div>
+
+      <h2 class="form-title" data-i18n="step2Title"></h2>
+      <p class="form-subtitle" data-i18n="step2Subtitle"></p>
+      <div class="step2-note" data-i18n="step2Note"></div>
+
+      <div class="form-fields">
+
+        <!-- Glucose -->
+        <div class="field-group">
+          <label class="field-label">
+            <span data-i18n="fields2.glucose"></span>
+            <div class="unit-toggle">
+              <button class="unit-btn active" data-unit="mmol" data-unit-key="units.mmol"></button>
+              <button class="unit-btn" data-unit="mgdl" data-unit-key="units.mgdl"></button>
+            </div>
+          </label>
+          <input type="number" id="input-glucose" class="field-input optional"
+                 min="1" max="30" step="0.1" placeholder="—">
+        </div>
+
+        <!-- Cholesterol + HDL -->
+        <div class="field-row">
+          <div class="field-group">
+            <label class="field-label" data-i18n="fields2.cholesterol"></label>
+            <input type="number" id="input-cholesterol" class="field-input optional"
+                   min="1" max="15" step="0.1" placeholder="mmol/L">
+          </div>
+          <div class="field-group">
+            <label class="field-label" data-i18n="fields2.hdl"></label>
+            <input type="number" id="input-hdl" class="field-input optional"
+                   min="0.3" max="5" step="0.1" placeholder="mmol/L">
+          </div>
+        </div>
+
+        <!-- CRP + Albumin -->
+        <div class="field-row">
+          <div class="field-group">
+            <label class="field-label" data-i18n="fields2.crp"></label>
+            <input type="number" id="input-crp" class="field-input optional"
+                   min="0" max="100" step="0.1" placeholder="mg/L">
+          </div>
+          <div class="field-group">
+            <label class="field-label" data-i18n="fields2.albumin"></label>
+            <input type="number" id="input-albumin" class="field-input optional"
+                   min="20" max="60" step="0.1" placeholder="g/L">
+          </div>
+        </div>
+
+      </div><!-- /form-fields -->
+
+      <div class="btn-row">
+        <button id="btn-skip" class="btn-secondary">
+          <span data-i18n="skipBtn"></span>
+        </button>
+        <button id="btn-calculate" class="btn-primary">
+          <span data-i18n="calculateBtn"></span>
+        </button>
+      </div>
+
+    </div>
+  </div><!-- /screen-step2 -->
+
+
+  <!-- ════════════════════════════════════════════════════════
+       SCREEN 4: RESULTS
+       ════════════════════════════════════════════════════════ -->
+  <div id="screen-results" class="screen">
+    <div class="results-container">
+
+      <!-- Main result card -->
+      <div class="result-main" data-status="good">
+        <div class="result-label" data-i18n="yourBioAge"></div>
+
+        <div class="age-ring-wrapper">
+          <svg class="age-ring-svg" viewBox="0 0 200 200">
+            <!-- Track -->
+            <circle cx="100" cy="100" r="75"
+              fill="none"
+              stroke="rgba(255,255,255,0.05)"
+              stroke-width="10"/>
+            <!-- Progress ring (rotated so it starts at top) -->
+            <circle class="age-ring-circle"
+              cx="100" cy="100" r="75"
+              fill="none"
+              stroke="#00d4aa"
+              stroke-width="10"
+              stroke-linecap="round"
+              stroke-dasharray="471"
+              stroke-dashoffset="471"
+              transform="rotate(-90 100 100)"/>
+          </svg>
+          <div class="age-ring-content">
+            <div id="result-bio-age" class="bio-age-number">--</div>
+            <div class="bio-age-unit" data-i18n="years"></div>
+          </div>
+        </div>
+
+        <div class="result-comparison">
+          <div class="comparison-item">
+            <span class="comparison-label" data-i18n="chronoLabel"></span>
+            <span id="result-chrono" class="comparison-value">--</span>
+          </div>
+          <div class="comparison-divider">|</div>
+          <div class="comparison-item">
+            <span class="comparison-label" data-i18n="differenceLabel"></span>
+            <span id="result-diff" class="comparison-value diff-value status-good">--</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Category bars -->
+      <div class="categories-section">
+        <div class="category-item">
+          <div class="category-header">
+            <span data-i18n="categories.cardio"></span>
+            <span class="category-age"></span>
+          </div>
+          <div class="bar-track">
+            <div id="bar-cardio" class="bar-fill"></div>
+          </div>
+        </div>
+        <div class="category-item">
+          <div class="category-header">
+            <span data-i18n="categories.metabolic"></span>
+            <span class="category-age"></span>
+          </div>
+          <div class="bar-track">
+            <div id="bar-metabolic" class="bar-fill"></div>
+          </div>
+        </div>
+        <div class="category-item">
+          <div class="category-header">
+            <span data-i18n="categories.recovery"></span>
+            <span class="category-age"></span>
+          </div>
+          <div class="bar-track">
+            <div id="bar-recovery" class="bar-fill"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Insight -->
+      <div class="insight-box">
+        <div class="insight-title" data-i18n="insightTitle"></div>
+        <p id="insight-text" class="insight-text"></p>
+      </div>
+
+      <!-- Working / Improve -->
+      <div class="actions-grid">
+        <div class="actions-card good">
+          <div class="actions-title" data-i18n="workingTitle"></div>
+          <ul id="working-list" class="actions-list"></ul>
+        </div>
+        <div class="actions-card warn">
+          <div class="actions-title" data-i18n="improveTitle"></div>
+          <ul id="improve-list" class="actions-list"></ul>
+        </div>
+      </div>
+
+      <!-- Action buttons -->
+      <div class="result-actions">
+        <button id="btn-save" class="btn-secondary">
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+            <path d="M7.5 1.5v8M5 7l2.5 2.5L10 7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+            <path d="M1.5 10.5v2h12v-2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+          </svg>
+          <span data-i18n="saveBtn"></span>
+        </button>
+        <button id="btn-recalc" class="btn-outline">
+          <span data-i18n="recalcBtn"></span>
+        </button>
+      </div>
+
+      <!-- 6-month reminder -->
+      <div class="reminder-box">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <circle cx="8" cy="8" r="6" stroke="#f5c842" stroke-width="1.2"/>
+          <path d="M8 5v3.5l2 1.2" stroke="#f5c842" stroke-width="1.2" stroke-linecap="round"/>
+        </svg>
+        <span data-i18n="reminderText"></span>
+      </div>
+
+      <!-- Science footer -->
+      <div class="science-footer">
+        <span class="powered-label" data-i18n="poweredBy"></span>
+        <div class="citation-badges">
+          <span class="badge">PhenoAge</span>
+          <span class="badge">WHO</span>
+          <span class="badge">AHA</span>
+        </div>
+      </div>
+
+    </div>
+  </div><!-- /screen-results -->
+
+  <script src="js/i18n.js"></script>
+  <script src="js/calculator.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
