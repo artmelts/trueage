@@ -1,12 +1,16 @@
 // TrueAge — Biological Age Calculator
-// Based on: PhenoAge (Levine 2018), AHA cardiovascular guidelines, WHO metabolic standards
+// Primary formula: PhenoAge (Levine et al., 2018) — validated on NHANES III
+// Supplemented by: AHA cardiovascular guidelines, WHO metabolic standards
 
 window.TrueAge = window.TrueAge || {};
 
 TrueAge.calculate = function(data) {
   const age = parseInt(data.age);
 
-  // ─── CARDIOVASCULAR AGE ─────────────────────────────────────────
+  // ═══════════════════════════════════════════════════════════════
+  // PART 1 — CARDIOVASCULAR AGE
+  // Based on: AHA heart rate recovery standards
+  // ═══════════════════════════════════════════════════════════════
   let cardioAdj = 0;
 
   // Resting Heart Rate
@@ -17,7 +21,7 @@ TrueAge.calculate = function(data) {
   else if (rhr <= 85) cardioAdj += 4;
   else                cardioAdj += 9;
 
-  // HR Recovery (drop in 1 minute after exercise)
+  // HR Recovery (drop in 1 minute)
   const hrAfter    = parseFloat(data.exerciseHR);
   const hrRecovery = parseFloat(data.recoveryHR);
   const recoveryDrop = hrAfter - hrRecovery;
@@ -41,123 +45,172 @@ TrueAge.calculate = function(data) {
 
   const cardioAge = age + cardioAdj;
 
-  // ─── METABOLIC AGE ──────────────────────────────────────────────
+  // ═══════════════════════════════════════════════════════════════
+  // PART 2 — PHENOAGE (Levine 2018)
+  // Uses 8 biomarkers from CBC + biochemistry
+  // Paper: https://doi.org/10.18632/aging.101414
+  // Coefficients from Table 2 of Levine et al., 2018
+  // ═══════════════════════════════════════════════════════════════
+
+  // Collect available biomarkers
+  const lymph    = parseFloat(data.lymphocytes);  // LYM%
+  const wbc      = parseFloat(data.wbc);          // K/ul = ×10³/µL
+  const mcv      = parseFloat(data.mcv);          // fL
+  const rdw      = parseFloat(data.rdw);          // %
+  const glucose  = parseFloat(data.glucose);      // mg/dL
+  const albumin  = parseFloat(data.albumin);      // g/dL
+  const creat    = parseFloat(data.creatinine);   // mg/dL
+  const alkphos  = parseFloat(data.alkphos);      // U/L
+  const chol     = parseFloat(data.cholesterol);  // mg/dL
+  const hdl      = parseFloat(data.hdl);          // mg/dL
+
+  const hasLymph   = !isNaN(lymph)   && data.lymphocytes  !== '';
+  const hasWBC     = !isNaN(wbc)     && data.wbc          !== '';
+  const hasMCV     = !isNaN(mcv)     && data.mcv          !== '';
+  const hasRDW     = !isNaN(rdw)     && data.rdw          !== '';
+  const hasGlucose = !isNaN(glucose) && data.glucose      !== '';
+  const hasAlbumin = !isNaN(albumin) && data.albumin      !== '';
+  const hasCreat   = !isNaN(creat)   && data.creatinine   !== '';
+  const hasAlkphos = !isNaN(alkphos) && data.alkphos      !== '';
+  const hasChol    = !isNaN(chol)    && data.cholesterol  !== '';
+  const hasHDL     = !isNaN(hdl)     && data.hdl          !== '';
+
+  const bloodMarkersCount = [hasLymph,hasWBC,hasMCV,hasRDW,hasGlucose,hasAlbumin,hasCreat,hasAlkphos].filter(Boolean).length;
+  const hasBlood = bloodMarkersCount >= 2;
+
+  let phenoBioAge = null;
+
+  if (hasBlood) {
+    // PhenoAge xb linear combination
+    // Intercept: -19.9067
+    // Units: albumin g/dL, creatinine µmol/L (×88.4), glucose mmol/L (/18),
+    //        CRP log(mg/dL) — use healthy default if missing,
+    //        lymph %, MCV fL, RDW %, ALP U/L, WBC ×10³/µL
+    let xb = -19.9067;
+
+    // Albumin (g/dL): coefficient -0.0336
+    xb += hasAlbumin ? (-0.0336 * albumin) : (-0.0336 * 4.3); // healthy default
+
+    // Creatinine (convert mg/dL → µmol/L): coefficient +0.0095
+    const creatUmol = hasCreat ? creat * 88.4 : 80.0;
+    xb += 0.0095 * creatUmol;
+
+    // Glucose (convert mg/dL → mmol/L): coefficient -0.1953
+    const glucoseMmol = hasGlucose ? glucose / 18.0 : 5.0;
+    xb += -0.1953 * glucoseMmol;
+
+    // CRP log(mg/dL): coefficient +0.0954 — use healthy default (CRP ~0.3 mg/dL)
+    xb += 0.0954 * Math.log(0.3);
+
+    // Lymphocyte %: coefficient -0.0120
+    xb += hasLymph ? (-0.0120 * lymph) : (-0.0120 * 30);
+
+    // MCV (fL): coefficient +0.0268
+    xb += hasMCV ? (0.0268 * mcv) : (0.0268 * 90);
+
+    // RDW (%): coefficient +0.3306
+    xb += hasRDW ? (0.3306 * rdw) : (0.3306 * 13.0);
+
+    // Alkaline Phosphatase (U/L): coefficient +0.00188
+    xb += hasAlkphos ? (0.00188 * alkphos) : (0.00188 * 70);
+
+    // WBC (×10³/µL): coefficient +0.0554
+    xb += hasWBC ? (0.0554 * wbc) : (0.0554 * 6.0);
+
+    // Mortality score M
+    const gamma  = 0.0076927;
+    const lambda = 0.000035933;
+    const M = 1 - Math.exp(-gamma / lambda * Math.exp(xb) * (1 - Math.exp(-lambda * age)));
+
+    // Convert M to PhenoAge (biological age)
+    const clampedM = Math.min(Math.max(M, 0.0001), 0.9999);
+    phenoBioAge = 141.50 + Math.log(-0.00553 * Math.log(1 - clampedM)) / 0.090165;
+    phenoBioAge = Math.round(phenoBioAge);
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // PART 3 — METABOLIC AGE (waist + cholesterol ratio)
+  // ═══════════════════════════════════════════════════════════════
   let metabolicAdj = 0;
 
-  // Waist-to-Height Ratio (WHtR)
+  // Waist-to-Height Ratio
   const waist  = parseFloat(data.waist);
   const height = parseFloat(data.height);
   const whtr   = waist / height;
-
   if      (whtr < 0.40) metabolicAdj -= 6;
   else if (whtr < 0.50) metabolicAdj -= 2;
   else if (whtr < 0.55) metabolicAdj += 2;
   else if (whtr < 0.60) metabolicAdj += 5;
   else                  metabolicAdj += 10;
 
-  // ─── CBC BLOOD MARKERS (optional) ──────────────────────────────
-  // Based on PhenoAge (Levine 2018) — uses standard CBC parameters
-  let cbcAdj = 0;
-  let hasCBC = false;
-
-  // Lymphocytes % — immune aging marker
-  const lymph = parseFloat(data.lymphocytes);
-  if (!isNaN(lymph) && data.lymphocytes !== '') {
-    hasCBC = true;
-    if      (lymph > 35)  cbcAdj -= 3;
-    else if (lymph >= 25) cbcAdj -= 1;
-    else if (lymph >= 18) cbcAdj += 1;
-    else                  cbcAdj += 4;
+  // Cholesterol / HDL ratio (if both available, mg/dL)
+  if (hasChol && hasHDL && hdl > 0) {
+    const ratio = chol / hdl;
+    if      (ratio < 3.0) metabolicAdj -= 3;
+    else if (ratio < 3.5) metabolicAdj -= 2;
+    else if (ratio <= 4.5) metabolicAdj += 0;
+    else if (ratio <= 5.5) metabolicAdj += 3;
+    else                   metabolicAdj += 6;
   }
-
-  // WBC (×10⁹/L) — inflammation / immune load
-  const wbc = parseFloat(data.wbc);
-  if (!isNaN(wbc) && data.wbc !== '') {
-    hasCBC = true;
-    if      (wbc < 5.0)  cbcAdj -= 2;
-    else if (wbc <= 7.5) cbcAdj += 0;
-    else if (wbc <= 10)  cbcAdj += 3;
-    else                 cbcAdj += 6;
-  }
-
-  // MCV (fL) — red cell size, aging marker
-  const mcv = parseFloat(data.mcv);
-  if (!isNaN(mcv) && data.mcv !== '') {
-    hasCBC = true;
-    if      (mcv < 80)   cbcAdj += 3;
-    else if (mcv <= 95)  cbcAdj -= 2;
-    else if (mcv <= 100) cbcAdj += 1;
-    else                 cbcAdj += 4;
-  }
-
-  // RDW (%) — red cell variability, strong aging predictor
-  const rdw = parseFloat(data.rdw);
-  if (!isNaN(rdw) && data.rdw !== '') {
-    hasCBC = true;
-    if      (rdw < 12.5) cbcAdj -= 3;
-    else if (rdw <= 13.5) cbcAdj -= 1;
-    else if (rdw <= 14.5) cbcAdj += 2;
-    else                  cbcAdj += 5;
-  }
-
-  // Hemoglobin (g/L) — oxygen capacity
-  const hgb = parseFloat(data.hemoglobin);
-  if (!isNaN(hgb) && data.hemoglobin !== '') {
-    hasCBC = true;
-    // Normal ranges differ by gender
-    const isMale = data.gender === 'male';
-    const hgbLow  = isMale ? 130 : 120;
-    const hgbHigh = isMale ? 170 : 155;
-    if      (hgb < hgbLow - 10)  cbcAdj += 4;
-    else if (hgb < hgbLow)       cbcAdj += 2;
-    else if (hgb <= hgbHigh)     cbcAdj -= 2;
-    else                         cbcAdj += 2;
-  }
-
-  // Blend CBC adjustment into metabolic score
-  if (hasCBC) metabolicAdj = Math.round((metabolicAdj + cbcAdj) / 2);
 
   const metabolicAge = age + metabolicAdj;
 
-  // ─── RECOVERY AGE ───────────────────────────────────────────────
-  const recoveryAge = age + recoveryAdj;
-
-  // ─── COMPOSITE BIO AGE ──────────────────────────────────────────
-  const hasBlood = hasCBC;
+  // ═══════════════════════════════════════════════════════════════
+  // PART 4 — COMPOSITE BIO AGE
+  // ═══════════════════════════════════════════════════════════════
   let bioAge;
-  if (hasBlood) {
-    bioAge = Math.round(cardioAge * 0.40 + metabolicAge * 0.40 + recoveryAge * 0.20);
+  if (phenoBioAge !== null) {
+    // PhenoAge available: blend with cardiovascular + metabolic
+    bioAge = Math.round(phenoBioAge * 0.50 + cardioAge * 0.30 + metabolicAge * 0.20);
   } else {
-    bioAge = Math.round(cardioAge * 0.50 + metabolicAge * 0.30 + recoveryAge * 0.20);
+    // No blood markers: cardio + metabolic only
+    bioAge = Math.round(cardioAge * 0.55 + metabolicAge * 0.45);
   }
 
-  // ─── COMPONENT SCORES (0–100, higher = biologically younger) ───
+  // ═══════════════════════════════════════════════════════════════
+  // SCORES (0–100, higher = biologically younger)
+  // ═══════════════════════════════════════════════════════════════
   const cardioScore    = adjToScore(cardioAdj);
   const metabolicScore = adjToScore(metabolicAdj);
   const recoveryScore  = adjToScore(recoveryAdj);
 
-  // ─── WHAT'S WORKING / WHAT TO IMPROVE ──────────────────────────
+  // PhenoAge score: how far from chronological age
+  let phenoScore = 60;
+  if (phenoBioAge !== null) {
+    const diff = phenoBioAge - age;
+    phenoScore = adjToScore(diff);
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // WHAT'S WORKING / WHAT TO IMPROVE
+  // ═══════════════════════════════════════════════════════════════
   const working = [];
   const improve = [];
 
-  if (rhr < 65)          working.push('goodHR');        else improve.push('improveHR');
+  if (rhr < 65)           working.push('goodHR');       else improve.push('improveHR');
   if (recoveryDrop >= 15) working.push('goodRecovery'); else improve.push('improveRecovery');
-  if (whtr < 0.50)       working.push('goodWaist');     else improve.push('improveWaist');
+  if (whtr < 0.50)        working.push('goodWaist');    else improve.push('improveWaist');
 
   if (!isNaN(bp) && data.bloodPressure !== '') {
     if (bp < 130) working.push('goodBP'); else improve.push('improveBP');
   }
   if (hasGlucose) {
-    let g = rawGlucose;
-    if (data.glucoseUnit === 'mgdl') g = g / 18.0;
-    if (g < 5.6) working.push('goodGlucose'); else improve.push('improveGlucose');
+    if (glucose < 100) working.push('goodGlucose'); else improve.push('improveGlucose');
   }
-  if (hasCholesterol) {
-    if ((chol / hdl) < 4.5) working.push('goodCholesterol');
+  if (hasChol && hasHDL && hdl > 0) {
+    if ((chol / hdl) < 4.0) working.push('goodCholesterol');
     else                     improve.push('improveCholesterol');
   }
+  if (hasRDW) {
+    if (rdw < 13.5) working.push('goodRDW'); else improve.push('improveRDW');
+  }
+  if (hasLymph) {
+    if (lymph >= 20 && lymph <= 45) working.push('goodLymph'); else improve.push('improveLymph');
+  }
 
-  // ─── INSIGHT KEY ────────────────────────────────────────────────
+  // ═══════════════════════════════════════════════════════════════
+  // INSIGHT KEY
+  // ═══════════════════════════════════════════════════════════════
   const diff = bioAge - age;
   let insightKey;
   if      (diff <= -5) insightKey = 'veryYoung';
@@ -172,22 +225,21 @@ TrueAge.calculate = function(data) {
     diff,
     cardioAge:    Math.round(cardioAge),
     metabolicAge: Math.round(metabolicAge),
-    recoveryAge:  Math.round(recoveryAge),
+    recoveryAge:  Math.round(age + recoveryAdj),
+    phenoBioAge,
     cardioScore,
     metabolicScore,
     recoveryScore,
+    phenoScore,
     working,
     improve,
     insightKey,
-    hasBlood
+    hasBlood,
+    bloodMarkersCount
   };
 };
 
-// Map adjustment (negative = younger, positive = older) to 0–100 score
-// adj = 0  → score 60 (healthy baseline)
-// adj = -15 → score ~97 (excellent)
-// adj = +20 → score ~10 (concerning)
+// Adjustment → score (0–100). adj=0 → 60, adj=-15 → ~97, adj=+20 → ~10
 function adjToScore(adj) {
-  const score = 60 - (adj * 2.5);
-  return Math.max(5, Math.min(100, Math.round(score)));
+  return Math.max(5, Math.min(100, Math.round(60 - adj * 2.5)));
 }

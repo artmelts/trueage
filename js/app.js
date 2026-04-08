@@ -90,7 +90,7 @@ function collectStep1() {
 }
 
 function collectStep2() {
-  ['lymphocytes','wbc','mcv','rdw','hemoglobin'].forEach(f => {
+  ['lymphocytes','wbc','mcv','rdw','glucose','albumin','creatinine','alkphos','cholesterol','hdl'].forEach(f => {
     const el = document.getElementById('input-' + f);
     if (el) formData[f] = el.value.trim();
   });
