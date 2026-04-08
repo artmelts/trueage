@@ -190,9 +190,9 @@ function renderResults() {
 
   // Category bars
   const bars = [
-    { id: 'bar-cardio',    score: r.cardioScore,    age: r.cardioAge },
-    { id: 'bar-metabolic', score: r.metabolicScore, age: r.metabolicAge },
-    { id: 'bar-recovery',  score: r.bloodScore,     age: r.bloodAge !== null ? r.bloodAge : r.recoveryAge }
+    { id: 'bar-cardio',    score: r.cardioScore    || 60, age: r.cardioAge    || r.chronoAge },
+    { id: 'bar-metabolic', score: r.metabolicScore || 60, age: r.metabolicAge || r.chronoAge },
+    { id: 'bar-recovery',  score: r.bloodScore     || 60, age: r.bloodAge     || r.recoveryAge || r.chronoAge }
   ];
   bars.forEach((b, i) => {
     const bar   = document.getElementById(b.id);
@@ -314,18 +314,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Step 2 Skip → Results
   document.getElementById('btn-skip')?.addEventListener('click', () => {
-    collectStep2();
-    results = TrueAge.calculate(formData);
-    showScreen('results');
-    setTimeout(renderResults, 300);
+    try {
+      collectStep2();
+      results = TrueAge.calculate(formData);
+      showScreen('results');
+      setTimeout(renderResults, 300);
+    } catch(e) { console.error('Calculate error:', e); alert('Error: ' + e.message); }
   });
 
   // Step 2 Calculate → Results
   document.getElementById('btn-calculate')?.addEventListener('click', () => {
-    collectStep2();
-    results = TrueAge.calculate(formData);
-    showScreen('results');
-    setTimeout(renderResults, 300);
+    try {
+      collectStep2();
+      results = TrueAge.calculate(formData);
+      showScreen('results');
+      setTimeout(renderResults, 300);
+    } catch(e) { console.error('Calculate error:', e); alert('Error: ' + e.message); }
   });
 
   // Unit toggle (glucose)
