@@ -89,11 +89,15 @@ TrueAge.calculate = function(data) {
   const waist  = parseFloat(data.waist);
   const height = parseFloat(data.height);
   const whtr   = waist / height;
-  if      (whtr < 0.42) metabolicAdj -= 5;
-  else if (whtr < 0.50) metabolicAdj -= 2;
-  else if (whtr < 0.55) metabolicAdj += 2;
-  else if (whtr < 0.60) metabolicAdj += 6;
-  else                  metabolicAdj += 11;
+
+  // Athletes have more muscle mass around the core — shift thresholds up by 0.03
+  const isAthlete = data.cardioMode === 'workout';
+  const whtrOffset = isAthlete ? 0.03 : 0;
+  if      (whtr < 0.42 + whtrOffset) metabolicAdj -= 5;
+  else if (whtr < 0.50 + whtrOffset) metabolicAdj -= 2;
+  else if (whtr < 0.55 + whtrOffset) metabolicAdj += 2;
+  else if (whtr < 0.60 + whtrOffset) metabolicAdj += 6;
+  else                                metabolicAdj += 11;
 
   const metabolicAge = age + metabolicAdj;
 
@@ -250,7 +254,8 @@ TrueAge.calculate = function(data) {
     if (!isNaN(rhr) && rhr < 65) working.push('goodHR'); else improve.push('improveHR');
     if (recoveryDrop >= 15) working.push('goodRecovery'); else improve.push('improveRecovery');
   }
-  if (whtr < 0.50)        working.push('goodWaist');    else improve.push('improveWaist');
+  const whtrThreshold = isAthlete ? 0.53 : 0.50;
+  if (whtr < whtrThreshold) working.push('goodWaist'); else improve.push('improveWaist');
   if (!isNaN(bp) && data.bloodPressure !== '') {
     if (bp < 130) working.push('goodBP'); else improve.push('improveBP');
   }
