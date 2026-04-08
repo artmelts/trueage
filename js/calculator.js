@@ -13,6 +13,8 @@ TrueAge.calculate = function(data) {
   // ═══════════════════════════════════════════════════════════════
   let cardioAdj = 0;
   let recoveryAdj = 0;
+  let rhr = NaN;
+  let recoveryDrop = 0;
 
   if (data.cardioMode === 'workout') {
     // ── Mode B: Workout data ──────────────────────────────────────
@@ -48,7 +50,7 @@ TrueAge.calculate = function(data) {
 
   } else {
     // ── Mode A: Home test (30 squats) ────────────────────────────
-    const rhr = parseFloat(data.restingHR);
+    rhr = parseFloat(data.restingHR);
     if      (rhr < 50)  cardioAdj -= 7;
     else if (rhr < 60)  cardioAdj -= 4;
     else if (rhr < 70)  cardioAdj -= 1;
@@ -58,7 +60,7 @@ TrueAge.calculate = function(data) {
 
     const hrAfter    = parseFloat(data.exerciseHR);
     const hrRecovery = parseFloat(data.recoveryHR);
-    const recoveryDrop = hrAfter - hrRecovery;
+    recoveryDrop = hrAfter - hrRecovery;
     if      (recoveryDrop > 25)  recoveryAdj = -4;
     else if (recoveryDrop >= 15) recoveryAdj = -1;
     else if (recoveryDrop >= 10) recoveryAdj =  2;
@@ -242,8 +244,12 @@ TrueAge.calculate = function(data) {
   const working = [];
   const improve = [];
 
-  if (rhr < 65)           working.push('goodHR');       else improve.push('improveHR');
-  if (recoveryDrop >= 15) working.push('goodRecovery'); else improve.push('improveRecovery');
+  if (data.cardioMode === 'workout') {
+    working.push('goodHR'); // workout mode implies active cardiovascular fitness
+  } else {
+    if (!isNaN(rhr) && rhr < 65) working.push('goodHR'); else improve.push('improveHR');
+    if (recoveryDrop >= 15) working.push('goodRecovery'); else improve.push('improveRecovery');
+  }
   if (whtr < 0.50)        working.push('goodWaist');    else improve.push('improveWaist');
   if (!isNaN(bp) && data.bloodPressure !== '') {
     if (bp < 130) working.push('goodBP'); else improve.push('improveBP');
