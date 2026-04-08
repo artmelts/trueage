@@ -104,12 +104,16 @@ const TRANSLATIONS = {
     goodBP:           "Optimal blood pressure",
     goodGlucose:      "Optimal glucose levels",
     goodCholesterol:  "Favorable cholesterol ratio",
+    goodRDW:          "Low RDW — healthy red cell uniformity",
+    goodWBC:          "Low white cell count — minimal inflammation",
     improveHR:        "Work on cardiovascular fitness",
     improveRecovery:  "Improve recovery with interval training",
     improveWaist:     "Reduce visceral fat (waist ratio elevated)",
     improveBP:        "Monitor and work on blood pressure",
     improveGlucose:   "Address glucose levels with dietary changes",
-    improveCholesterol:"Review cholesterol ratio with a doctor"
+    improveCholesterol:"Review cholesterol ratio with a doctor",
+    improveRDW:       "Elevated RDW — check B12, folate, iron",
+    improveWBC:       "Elevated white cells — investigate inflammation"
   },
 
   ru: {
@@ -214,12 +218,16 @@ const TRANSLATIONS = {
     goodBP:           "Оптимальное артериальное давление",
     goodGlucose:      "Оптимальный уровень глюкозы",
     goodCholesterol:  "Хорошее соотношение холестерина",
+    goodRDW:          "Низкий RDW — однородные эритроциты",
+    goodWBC:          "Низкий уровень лейкоцитов — минимальное воспаление",
     improveHR:        "Развивайте кардиовыносливость",
     improveRecovery:  "Улучшите восстановление с помощью интервальных тренировок",
     improveWaist:     "Снизьте висцеральный жир (соотношение талии/рост повышено)",
     improveBP:        "Контролируйте и снижайте давление",
     improveGlucose:   "Скорректируйте уровень глюкозы через питание",
-    improveCholesterol:"Обсудите соотношение холестерина с врачом"
+    improveCholesterol:"Обсудите соотношение холестерина с врачом",
+    improveRDW:       "Повышенный RDW — проверьте B12, фолат, железо",
+    improveWBC:       "Повышенные лейкоциты — исследуйте источник воспаления"
   },
 
   he: {
@@ -324,11 +332,15 @@ const TRANSLATIONS = {
     goodBP:           "לחץ דם אופטימלי",
     goodGlucose:      "רמות גלוקוז אופטימליות",
     goodCholesterol:  "יחס כולסטרול טוב",
+    goodRDW:          "RDW נמוך — תאי דם אדומים אחידים",
+    goodWBC:          "ספירת לויקוציטים נמוכה — דלקת מינימלית",
     improveHR:        "שפר כושר לב-ריאה",
     improveRecovery:  "שפר התאוששות עם אימון אינטרוולים",
     improveWaist:     "הפחת שומן קרביים (יחס מותן/גובה גבוה)",
     improveBP:        "נטר והפחת לחץ דם",
     improveGlucose:   "טפל ברמות גלוקוז עם שינויי תזונה",
-    improveCholesterol:"בדוק יחס כולסטרול עם רופא"
+    improveCholesterol:"בדוק יחס כולסטרול עם רופא",
+    improveRDW:       "RDW מוגבר — בדוק B12, חומצה פולית, ברזל",
+    improveWBC:       "לויקוציטים מוגברים — חקור מקור הדלקת"
   }
 };

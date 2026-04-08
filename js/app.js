@@ -183,7 +183,7 @@ function renderResults() {
   const bars = [
     { id: 'bar-cardio',    score: r.cardioScore,    age: r.cardioAge },
     { id: 'bar-metabolic', score: r.metabolicScore, age: r.metabolicAge },
-    { id: 'bar-recovery',  score: r.recoveryScore,  age: r.recoveryAge }
+    { id: 'bar-recovery',  score: r.bloodScore,     age: r.bloodAge !== null ? r.bloodAge : r.recoveryAge }
   ];
   bars.forEach((b, i) => {
     const bar   = document.getElementById(b.id);
