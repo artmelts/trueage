@@ -55,41 +55,75 @@ TrueAge.calculate = function(data) {
   else if (whtr < 0.60) metabolicAdj += 5;
   else                  metabolicAdj += 10;
 
-  // Glucose (optional)
-  let hasGlucose = false;
-  const rawGlucose = parseFloat(data.glucose);
-  if (!isNaN(rawGlucose) && data.glucose !== '') {
-    hasGlucose = true;
-    let glucose = rawGlucose;
-    if (data.glucoseUnit === 'mgdl') glucose = glucose / 18.0;
-    if      (glucose < 5.0)  metabolicAdj -= 3;
-    else if (glucose <= 5.5) metabolicAdj += 0;
-    else if (glucose <= 6.0) metabolicAdj += 2;
-    else if (glucose <= 6.9) metabolicAdj += 5;
-    else                     metabolicAdj += 10;
+  // ─── CBC BLOOD MARKERS (optional) ──────────────────────────────
+  // Based on PhenoAge (Levine 2018) — uses standard CBC parameters
+  let cbcAdj = 0;
+  let hasCBC = false;
+
+  // Lymphocytes % — immune aging marker
+  const lymph = parseFloat(data.lymphocytes);
+  if (!isNaN(lymph) && data.lymphocytes !== '') {
+    hasCBC = true;
+    if      (lymph > 35)  cbcAdj -= 3;
+    else if (lymph >= 25) cbcAdj -= 1;
+    else if (lymph >= 18) cbcAdj += 1;
+    else                  cbcAdj += 4;
   }
 
-  // Cholesterol Ratio (optional)
-  let hasCholesterol = false;
-  const chol = parseFloat(data.cholesterol);
-  const hdl  = parseFloat(data.hdl);
-  if (!isNaN(chol) && !isNaN(hdl) && hdl > 0 && data.cholesterol !== '' && data.hdl !== '') {
-    hasCholesterol = true;
-    const ratio = chol / hdl;
-    if      (ratio < 3.5) metabolicAdj -= 2;
-    else if (ratio <= 4.5) metabolicAdj += 0;
-    else if (ratio <= 5.5) metabolicAdj += 3;
-    else                   metabolicAdj += 6;
+  // WBC (×10⁹/L) — inflammation / immune load
+  const wbc = parseFloat(data.wbc);
+  if (!isNaN(wbc) && data.wbc !== '') {
+    hasCBC = true;
+    if      (wbc < 5.0)  cbcAdj -= 2;
+    else if (wbc <= 7.5) cbcAdj += 0;
+    else if (wbc <= 10)  cbcAdj += 3;
+    else                 cbcAdj += 6;
   }
+
+  // MCV (fL) — red cell size, aging marker
+  const mcv = parseFloat(data.mcv);
+  if (!isNaN(mcv) && data.mcv !== '') {
+    hasCBC = true;
+    if      (mcv < 80)   cbcAdj += 3;
+    else if (mcv <= 95)  cbcAdj -= 2;
+    else if (mcv <= 100) cbcAdj += 1;
+    else                 cbcAdj += 4;
+  }
+
+  // RDW (%) — red cell variability, strong aging predictor
+  const rdw = parseFloat(data.rdw);
+  if (!isNaN(rdw) && data.rdw !== '') {
+    hasCBC = true;
+    if      (rdw < 12.5) cbcAdj -= 3;
+    else if (rdw <= 13.5) cbcAdj -= 1;
+    else if (rdw <= 14.5) cbcAdj += 2;
+    else                  cbcAdj += 5;
+  }
+
+  // Hemoglobin (g/L) — oxygen capacity
+  const hgb = parseFloat(data.hemoglobin);
+  if (!isNaN(hgb) && data.hemoglobin !== '') {
+    hasCBC = true;
+    // Normal ranges differ by gender
+    const isMale = data.gender === 'male';
+    const hgbLow  = isMale ? 130 : 120;
+    const hgbHigh = isMale ? 170 : 155;
+    if      (hgb < hgbLow - 10)  cbcAdj += 4;
+    else if (hgb < hgbLow)       cbcAdj += 2;
+    else if (hgb <= hgbHigh)     cbcAdj -= 2;
+    else                         cbcAdj += 2;
+  }
+
+  // Blend CBC adjustment into metabolic score
+  if (hasCBC) metabolicAdj = Math.round((metabolicAdj + cbcAdj) / 2);
 
   const metabolicAge = age + metabolicAdj;
 
   // ─── RECOVERY AGE ───────────────────────────────────────────────
-  // Derived from cardiac recovery performance
   const recoveryAge = age + recoveryAdj;
 
   // ─── COMPOSITE BIO AGE ──────────────────────────────────────────
-  const hasBlood = hasGlucose || hasCholesterol;
+  const hasBlood = hasCBC;
   let bioAge;
   if (hasBlood) {
     bioAge = Math.round(cardioAge * 0.40 + metabolicAge * 0.40 + recoveryAge * 0.20);

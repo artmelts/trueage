@@ -260,45 +260,44 @@
 
       <div class="form-fields">
 
-        <!-- Glucose -->
+        <!-- Lymphocytes % + WBC -->
+        <div class="field-row">
+          <div class="field-group">
+            <label class="field-label" data-i18n="fields2.lymphocytes"></label>
+            <input type="number" id="input-lymphocytes" class="field-input optional"
+                   min="5" max="70" step="0.1" placeholder="%">
+            <small class="field-hint" data-i18n="fields2.lymphocytesHint"></small>
+          </div>
+          <div class="field-group">
+            <label class="field-label" data-i18n="fields2.wbc"></label>
+            <input type="number" id="input-wbc" class="field-input optional"
+                   min="1" max="30" step="0.1" placeholder="×10⁹/L">
+            <small class="field-hint" data-i18n="fields2.wbcHint"></small>
+          </div>
+        </div>
+
+        <!-- MCV + RDW -->
+        <div class="field-row">
+          <div class="field-group">
+            <label class="field-label" data-i18n="fields2.mcv"></label>
+            <input type="number" id="input-mcv" class="field-input optional"
+                   min="60" max="120" step="0.1" placeholder="fL">
+            <small class="field-hint" data-i18n="fields2.mcvHint"></small>
+          </div>
+          <div class="field-group">
+            <label class="field-label" data-i18n="fields2.rdw"></label>
+            <input type="number" id="input-rdw" class="field-input optional"
+                   min="10" max="25" step="0.1" placeholder="%">
+            <small class="field-hint" data-i18n="fields2.rdwHint"></small>
+          </div>
+        </div>
+
+        <!-- Hemoglobin -->
         <div class="field-group">
-          <label class="field-label">
-            <span data-i18n="fields2.glucose"></span>
-            <div class="unit-toggle">
-              <button class="unit-btn active" data-unit="mmol" data-unit-key="units.mmol"></button>
-              <button class="unit-btn" data-unit="mgdl" data-unit-key="units.mgdl"></button>
-            </div>
-          </label>
-          <input type="number" id="input-glucose" class="field-input optional"
-                 min="1" max="30" step="0.1" placeholder="—">
-        </div>
-
-        <!-- Cholesterol + HDL -->
-        <div class="field-row">
-          <div class="field-group">
-            <label class="field-label" data-i18n="fields2.cholesterol"></label>
-            <input type="number" id="input-cholesterol" class="field-input optional"
-                   min="1" max="15" step="0.1" placeholder="mmol/L">
-          </div>
-          <div class="field-group">
-            <label class="field-label" data-i18n="fields2.hdl"></label>
-            <input type="number" id="input-hdl" class="field-input optional"
-                   min="0.3" max="5" step="0.1" placeholder="mmol/L">
-          </div>
-        </div>
-
-        <!-- CRP + Albumin -->
-        <div class="field-row">
-          <div class="field-group">
-            <label class="field-label" data-i18n="fields2.crp"></label>
-            <input type="number" id="input-crp" class="field-input optional"
-                   min="0" max="100" step="0.1" placeholder="mg/L">
-          </div>
-          <div class="field-group">
-            <label class="field-label" data-i18n="fields2.albumin"></label>
-            <input type="number" id="input-albumin" class="field-input optional"
-                   min="20" max="60" step="0.1" placeholder="g/L">
-          </div>
+          <label class="field-label" data-i18n="fields2.hemoglobin"></label>
+          <input type="number" id="input-hemoglobin" class="field-input optional"
+                 min="80" max="200" step="0.1" placeholder="g/L">
+          <small class="field-hint" data-i18n="fields2.hemoglobinHint"></small>
         </div>
 
       </div><!-- /form-fields -->

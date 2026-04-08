@@ -90,12 +90,10 @@ function collectStep1() {
 }
 
 function collectStep2() {
-  ['glucose','cholesterol','hdl','crp','albumin'].forEach(f => {
+  ['lymphocytes','wbc','mcv','rdw','hemoglobin'].forEach(f => {
     const el = document.getElementById('input-' + f);
     if (el) formData[f] = el.value.trim();
   });
-  const activeUnit = document.querySelector('.unit-btn.active');
-  formData.glucoseUnit = activeUnit ? activeUnit.dataset.unit : 'mmol';
 }
 
 // ─── VALIDATION ──────────────────────────────────────────────────────────────
