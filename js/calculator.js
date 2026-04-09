@@ -90,13 +90,21 @@ TrueAge.calculate = function(data) {
   const height = parseFloat(data.height);
   const whtr   = waist / height;
 
-  // Thresholds shifted +0.03 vs standard (accounts for muscular builds)
-  // WHtR 0.45/0.53/0.58/0.63 — validated for active adults
-  if      (whtr < 0.45) metabolicAdj -= 5;
-  else if (whtr < 0.53) metabolicAdj -= 2;
-  else if (whtr < 0.58) metabolicAdj += 2;
-  else if (whtr < 0.63) metabolicAdj += 6;
-  else                  metabolicAdj += 11;
+  // For strength athletes (CrossFit/gym): thresholds shifted further (+0.07 total)
+  // because muscle mass increases waist circumference without increasing body fat
+  if (data.strengthTraining) {
+    if      (whtr < 0.52) metabolicAdj -= 5;
+    else if (whtr < 0.58) metabolicAdj -= 2;
+    else if (whtr < 0.63) metabolicAdj += 2;
+    else if (whtr < 0.68) metabolicAdj += 6;
+    else                  metabolicAdj += 11;
+  } else {
+    if      (whtr < 0.45) metabolicAdj -= 5;
+    else if (whtr < 0.53) metabolicAdj -= 2;
+    else if (whtr < 0.58) metabolicAdj += 2;
+    else if (whtr < 0.63) metabolicAdj += 6;
+    else                  metabolicAdj += 11;
+  }
 
   const metabolicAge = age + metabolicAdj;
 
@@ -253,7 +261,8 @@ TrueAge.calculate = function(data) {
     if (!isNaN(rhr) && rhr < 65) working.push('goodHR'); else improve.push('improveHR');
     if (recoveryDrop >= 15) working.push('goodRecovery'); else improve.push('improveRecovery');
   }
-  if (whtr < 0.53) working.push('goodWaist'); else improve.push('improveWaist');
+  const waistThreshold = data.strengthTraining ? 0.58 : 0.53;
+  if (whtr < waistThreshold) working.push('goodWaist'); else improve.push('improveWaist');
   if (!isNaN(bp) && data.bloodPressure !== '') {
     if (bp < 130) working.push('goodBP'); else improve.push('improveBP');
   }

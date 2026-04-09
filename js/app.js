@@ -89,6 +89,8 @@ function collectStep1() {
     const el = document.getElementById('input-' + f);
     if (el) formData[f] = el.value.trim();
   });
+  const stEl = document.getElementById('input-strengthTraining');
+  if (stEl) formData.strengthTraining = stEl.checked;
   if (!formData.cardioMode) formData.cardioMode = 'test';
 }
 
@@ -249,7 +251,8 @@ function scoreToGradient(score) {
 function resetApp() {
   formData = { cardioMode: 'test' };
   results  = null;
-  document.querySelectorAll('.screen input').forEach(inp => inp.value = '');
+  document.querySelectorAll('.screen input[type!="checkbox"]').forEach(inp => inp.value = '');
+  document.querySelectorAll('.screen input[type="checkbox"]').forEach(inp => inp.checked = false);
   document.querySelectorAll('.gender-btn').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('.cardio-mode-btn').forEach((b, i) => {
     b.classList.toggle('active', i === 0);
