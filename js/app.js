@@ -251,8 +251,10 @@ function scoreToGradient(score) {
 function resetApp() {
   formData = { cardioMode: 'test' };
   results  = null;
-  document.querySelectorAll('.screen input[type!="checkbox"]').forEach(inp => inp.value = '');
-  document.querySelectorAll('.screen input[type="checkbox"]').forEach(inp => inp.checked = false);
+  document.querySelectorAll('.screen input').forEach(inp => {
+    if (inp.type === 'checkbox') inp.checked = false;
+    else inp.value = '';
+  });
   document.querySelectorAll('.gender-btn').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('.cardio-mode-btn').forEach((b, i) => {
     b.classList.toggle('active', i === 0);
